@@ -22,10 +22,10 @@ var strings = {
   type: 'type'
 }
 
-module.exports = gqlTokenizer
+module.exports = graphqlTokenizer
 
-function gqlTokenizer (input) {
-  assert.ok(Buffer.isBuffer(input), 'gql-tokenizer: input should be type Buffer')
+function graphqlTokenizer (input) {
+  assert.ok(Buffer.isBuffer(input), 'graphql-tokenizer: input should be type Buffer')
 
   var current = 0
   var tokens = []

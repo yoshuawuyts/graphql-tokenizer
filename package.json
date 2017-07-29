@@ -1,7 +1,7 @@
 {
-  "name": "gql-tokenizer",
+  "name": "graphql-tokenizer",
   "description": "Tokenize a graphql schema",
-  "repository": "yoshuawuyts/gql-tokenizer",
+  "repository": "yoshuawuyts/graphql-tokenizer",
   "version": "1.0.0",
   "scripts": {
     "deps": "dependency-check . && dependency-check . --extra --no-dev",
