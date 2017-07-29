@@ -15,6 +15,7 @@ tape('tokenizes a graphql string', function (assert) {
   `
 
   var res = tokenize(Buffer.from(schema))
+  console.log(res)
   spok(assert, res, [
     { type: 'comment', value: '# Fetch the film by id' }
   ])
