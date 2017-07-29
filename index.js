@@ -1,23 +1,25 @@
 var assert = require('assert')
 
 var codes = {
-  leftBrace: '{'.charCodeAt(),
-  leftParen: '('.charCodeAt(),
+  bom: '\uFEFF',
   carriage: '\r'.charCodeAt(),
   colon: ':'.charCodeAt(),
-  comment: '#'.charCodeAt(),
   comma: ','.charCodeAt(),
+  comment: '#'.charCodeAt(),
+  leftBrace: '{'.charCodeAt(),
+  leftParen: '('.charCodeAt(),
   newline: '\n'.charCodeAt(),
+  rightBrace: '}'.charCodeAt(),
   rightParen: ')'.charCodeAt(),
-  rightBrace: '}'.charCodeAt()
+  zero: '0'.charCodeAt()
 }
 
 var strings = {
-  float: Buffer.from('Float'),
-  int: Buffer.from('Int'),
-  spread: Buffer.from('...'),
-  string: Buffer.from('String'),
-  type: Buffer.from('type')
+  float: 'Float',
+  int: 'Int',
+  spread: '...',
+  string: 'String',
+  type: 'type'
 }
 
 module.exports = gqlTokenizer
@@ -33,7 +35,7 @@ function gqlTokenizer (input) {
   while (current < input.length) {
     char = input[current]
 
-    if (isWhitespace(char) || char === codes.comma) {
+    if (isWhitespace(char) || char === codes.comma || char === codes.bom) {
       current++
       continue
     }
@@ -80,21 +82,31 @@ function gqlTokenizer (input) {
     }
 
     // read keywords
-    if (isCharacter(char)) {
+    if (isString(char)) {
       while (isCharacter(char)) {
         str += String.fromCharCode(char)
         char = input[++current]
       }
       if (str === strings.float) {
-        tokens.push({ type: 'float', value: str })
+        tokens.push({ type: 'Name', id: 'float', value: str })
       } else if (str === strings.int) {
-        tokens.push({ type: 'int', value: str })
-      } else if (str === strings.string) {
-        tokens.push({ type: 'string', value: str })
+        tokens.push({ type: 'Name', id: 'int', value: str })
       } else if (str === strings.type) {
-        tokens.push({ type: 'type', value: str })
+        tokens.push({ type: 'Name', id: 'type', value: str })
+      } else if (str === strings.id) {
+        tokens.push({ type: 'Name', id: 'type', value: str })
       } else {
-        tokens.push({ type: 'string', value: str })
+        tokens.push({ type: 'Name', id: 'string', value: str })
+      }
+      str = ''
+      continue
+    }
+
+    if (isNumber(char)) {
+      while (isNumber(char)) {
+        if (str === '0') throw new Error('Invalid number, unexpected digit after 0')
+        str += String.fromCharCode(char)
+        char = input[++current]
       }
       str = ''
       continue
@@ -112,6 +124,15 @@ function isCharacter (char) {
     (char >= 97 && char <= 122) ||     // a-z
     char === 45 ||                     // -
     (char >= 48 && char <= 57)         // 0-9
+}
+
+function isNumber (char) {
+  return char >= 48 && char <= 57      // 0-9
+}
+
+function isString (char) {
+  return (char >= 65 && char <= 90) || // A-Z
+    (char >= 97 && char <= 122)        // a-z
 }
 
 function isWhitespace (b) {
