@@ -6,7 +6,7 @@ Tokenize a graphql schema.
 
 ## Usage
 ```js
-var string = `
+var schema = `
   type Film {
     title: String
   }
