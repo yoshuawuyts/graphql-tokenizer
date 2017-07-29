@@ -17,7 +17,7 @@ var string = `
   }
 `
 
-var tokens = tokenize(string)
+  var res = tokenize(Buffer.from(schema))
 ```
 
 ## API

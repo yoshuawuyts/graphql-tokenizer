@@ -2,10 +2,16 @@ var assert = require('assert')
 
 var NEWLINE = /[\r\n]{1,2}/
 
+var codes = {
+  comment: '#'.charCodeAt(),
+  newline: '\n'.charCodeAt(),
+  carriage: '\r'.charCodeAt()
+}
+
 module.exports = gqlTokenizer
 
 function gqlTokenizer (input) {
-  assert.equal(typeof input, 'string', 'gql-tokenizer: input should be type string')
+  assert.ok(Buffer.isBuffer(input), 'gql-tokenizer: input should be type Buffer')
 
   var current = 0
   var tokens = []
@@ -15,13 +21,12 @@ function gqlTokenizer (input) {
   while (current < input.length) {
     char = input[current]
 
-    if (char === '#') {
-      char = input[++current]
-      while (!NEWLINE.test(char)) {
-        buf += char
+    if (char === codes.comment) {
+      while (char !== codes.newline && char !== codes.carriage) {
+        buf += String.fromCharCode(char)
         char = input[++current]
       }
-      tokens.push({ type: 'comment', value: buf.trim() })
+      tokens.push({ type: 'comment', value: buf })
       buf = ''
       continue
     }
